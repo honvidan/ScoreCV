@@ -1,35 +1,33 @@
 # ScoreCV
 
-**ScoreCV** is an automated CV screening and matching tool built with basic NLP techniques. It's designed to help HR professionals quickly identify the most relevant candidates for a job by scoring and ranking CVs against a given job description.
+**ScoreCV** is an automated CV screening and matching tool built with NLP techniques. It's designed to help HR professionals quickly rank multiple candidates against a specific job description.
 
-This project was developed as part of the "Python for Engineering" course to demonstrate fundamental concepts in Natural Language Processing (NLP).
+This project was developed to demonstrate fundamental concepts in Natural Language Processing (NLP) and how they can be applied to practical HR tasks.
 
 ## Features
 
--   **Job Description Input:** Paste a job description into a text area.
--   **Multiple CV Uploads:** Upload one or more CVs in PDF format.
+-   **Multiple CV Uploads:** Upload one or more CVs (PDF, DOCX, TXT) to be scored against a single job description.
 -   **Automated Scoring:** The system uses TF-IDF and Cosine Similarity to calculate a match score for each CV.
--   **Ranked Results:** View a ranked list of CVs, from most to least relevant, with their corresponding match scores.
+-   **CV Classification:** Automatically predicts a job category for each uploaded CV (e.g., "Software Engineer").
+-   **Ranked Candidate Results:** View a ranked table of all processed CVs, sorted from most to least relevant, with their corresponding match scores and predicted categories.
 
 ## Tech Stack
 
 -   **Backend:** Python 3.10+, Flask
--   **Frontend:** Python 3.10+, Streamlit
+-   **Frontend:** Python 3.10+, Streamlit, Pandas
 -   **NLP:** NLTK, scikit-learn
--   **PDF Parsing:** PyPDF2
+-   **File Parsing:** PyPDF2, python-docx
 
 ## How It Works
 
-1.  **Text Extraction:** The tool first extracts raw text from the uploaded PDF CVs.
-2.  **Text Cleaning:** Both the job description and the CV text are cleaned and preprocessed. This involves:
-    -   Converting text to lowercase.
-    -   Removing punctuation and special characters.
-    -   Tokenizing the text into individual words.
-    -   Removing common English "stop words" (e.g., "the", "a", "in").
-    -   Lemmatizing words to their root form (e.g., "running" becomes "run").
-3.  **Vectorization:** The cleaned text is converted into numerical vectors using the TF-IDF (Term Frequency-Inverse Document Frequency) algorithm. This technique highlights words that are important to a document within a collection of documents.
-4.  **Similarity Matching:** The system calculates the Cosine Similarity between the job description vector and each CV vector. The resulting score (from 0 to 100) represents how well the CV matches the job description.
-5.  **Displaying Results:** The CVs are ranked by their scores and displayed in a clean, easy-to-read format.
+1.  **File Upload:** The user uploads multiple CVs and a single job description.
+2.  **Iterative Analysis:** The application iterates through each CV. For each one, it performs the following steps:
+    a. **Text Extraction:** Extracts raw text from the CV and the job description file.
+    b. **CV Classification:** Predicts a job category for the CV based on keyword matching.
+    c. **Text Cleaning:** Cleans and preprocesses the text from both documents (lemmatization, stop-word removal, etc.).
+    d. **Vectorization:** Converts the cleaned text into numerical TF-IDF vectors.
+    e. **Similarity Matching:** Calculates the Cosine Similarity between the job description vector and the CV vector to get a match score.
+3.  **Displaying Results:** All results are collected and displayed in a single table, ranked by match score, allowing for easy comparison of candidates.
 
 ## Setup and Usage
 
@@ -61,26 +59,34 @@ This project was developed as part of the "Python for Engineering" course to dem
 
 1.  **Launch Backend app:**
     ```bash
-    python ./backend/api.py
+    python -m backend.main
     ```
 
-1.  **Launch Frontend app:**
+2.  **Launch Frontend app:**
     ```bash
     streamlit run ./frontend/app.py
     ```
 
-2.  **Use the application:**
+3.  **Use the application:**
     -   Your browser should open with the ScoreCV interface.
-    -   Paste the job description into the text area.
-    -   Upload one or more CVs in PDF format.
-    -   Click the "Generate Scores" button to see the results.
+    -   Upload one or more CVs in PDF, DOCX, or TXT format.
+    -   Upload a single job description in PDF, DOCX, or TXT format.
+    -   Click the "Analyze Documents" button to see the ranked results.
 
 ## Project Structure
 
 ```
 ScoreCV/
 ├── backend/
-│   ├── api.py
+│   ├── __init__.py
+│   ├── main.py          # Main application entry point
+│   ├── core/
+│   │   ├── __init__.py
+│   │   ├── nlp.py       # NLP preprocessing functions
+│   │   └── parser.py    # File parsing and text extraction
+│   └── routes/
+│       ├── __init__.py
+│       └── matching.py  # API routes for matching and classification
 ├── frontend/
 │   ├── app.py           # The main Streamlit application
 ├── requirements.txt     # Project dependencies

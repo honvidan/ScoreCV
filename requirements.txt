@@ -2,5 +2,6 @@ streamlit
 Flask
 pandas
 scikit-learn
-PyPDF2
 python-docx
+nltk
+PyPDF2
