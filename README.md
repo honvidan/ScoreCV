@@ -24,10 +24,42 @@ This project was developed to demonstrate fundamental concepts in Natural Langua
 2.  **Iterative Analysis:** The application iterates through each CV. For each one, it performs the following steps:
     a. **Text Extraction:** Extracts raw text from the CV and the job description file.
     b. **CV Classification:** Predicts a job category for the CV based on keyword matching.
-    c. **Text Cleaning:** Cleans and preprocesses the text from both documents (lemmatization, stop-word removal, etc.).
+    c. **NLP Pipeline:** Processes the text through a comprehensive NLP pipeline (see details below).
     d. **Vectorization:** Converts the cleaned text into numerical TF-IDF vectors.
-    e. **Similarity Matching:** Calculates the Cosine Similarity between the job description vector and the CV vector to get a match score.
+    e. **Similarity Matching:** Calculates the Cosine Similarity between the job description vector and the CV vector to get a match score (0-100%).
 3.  **Displaying Results:** All results are collected and displayed in a single table, ranked by match score, allowing for easy comparison of candidates.
+
+## NLP Pipeline
+
+The system uses a structured NLP pipeline to preprocess and analyze text documents:
+
+```
+Input Text
+    ↓
+1. Lowercase + Remove Punctuation
+    ↓
+2. Tokenization (split into words)
+    ↓
+3. Stopword Removal (English + Vietnamese)
+    ↓
+4. TF-IDF Vectorization
+    ↓
+5. Cosine Similarity Calculation
+    ↓
+Output: Similarity Score (0-100%)
+```
+
+### Pipeline Steps Explained:
+
+1. **Lowercase + Remove Punctuation:** Converts all text to lowercase and removes punctuation marks to ensure consistent processing.
+
+2. **Tokenization:** Splits the text into individual words (tokens) using NLTK's word tokenizer, filtering out non-alphabetic characters.
+
+3. **Stopword Removal:** Removes common stopwords in both English (using NLTK) and Vietnamese (custom dictionary) to focus on meaningful content words.
+
+4. **TF-IDF Vectorization:** Converts the preprocessed text into numerical vectors using Term Frequency-Inverse Document Frequency (TF-IDF) to represent the importance of words in the documents.
+
+5. **Cosine Similarity Calculation:** Computes the cosine similarity between the CV and job description vectors, returning a similarity score as a percentage (0-100%).
 
 ## Setup and Usage
 

@@ -3,17 +3,21 @@ import requests
 import pandas as pd
 import os
 
+# Configuration
+BACKEND_URL = os.environ.get('BACKEND_URL', 'http://127.0.0.1:5000')
+
 st.title("Score CV")
 st.write("Upload multiple CVs and one Job Description to see a ranked list of candidates.")
 
 # Helper to get mimetype
-def get_mimetype(file_type):
-    if file_type == "application/pdf":
-        return "application/pdf"
-    elif file_type == "application/vnd.openxmlformats-officedocument.wordprocessingml.document":
-        return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    else:
-        return "text/plain"
+def get_mimetype(file_type: str) -> str:
+    """Get mimetype from file type."""
+    mimetype_map = {
+        "application/pdf": "application/pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": 
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    }
+    return mimetype_map.get(file_type, "text/plain")
 
 # File Uploaders
 st.subheader("Upload Documents")
@@ -45,7 +49,11 @@ if st.button("Analyze Documents"):
                     # --- 1. Classify CV ---
                     # The classification endpoint expects only the CV file
                     classify_files = {"cv_file": cv_file_data}
-                    classify_response = requests.post("http://127.0.0.1:5000/classify_cv_file", files=classify_files)
+                    classify_response = requests.post(
+                        f"{BACKEND_URL}/classify_cv_file", 
+                        files=classify_files,
+                        timeout=30
+                    )
                     
                     category = "N/A"
                     if classify_response.status_code == 200:
@@ -54,7 +62,11 @@ if st.button("Analyze Documents"):
                         st.warning(f"Could not classify {cv_file.name}.")
 
                     # --- 2. Match CV with JD ---
-                    match_response = requests.post("http://127.0.0.1:5000/match_cv_jd_files", files=files)
+                    match_response = requests.post(
+                        f"{BACKEND_URL}/match_cv_jd_files", 
+                        files=files,
+                        timeout=30
+                    )
                     
                     score = 0.0
                     if match_response.status_code == 200:
@@ -84,8 +96,8 @@ if st.button("Analyze Documents"):
             df = pd.DataFrame(results)
             # Sort by score descending
             df = df.sort_values(by="Match Score", ascending=False).reset_index(drop=True)
-            # Format score as percentage
-            df["Match Score"] = df["Match Score"].apply(lambda x: f"{x:.2%}")
+            # Format score as percentage (backend returns 0-100, so divide by 100 for percentage format)
+            df["Match Score"] = df["Match Score"].apply(lambda x: f"{float(x)/100:.2%}")
             
             st.dataframe(df)
         else:
